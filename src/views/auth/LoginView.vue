@@ -18,7 +18,7 @@ async function handleLogin() {
     password: password.value,
   })
 
-  auth.login(res.data.accessToken)
+  auth.login(res.data.accessToken, res.data.user)
   router.push('/')
 }
 </script>

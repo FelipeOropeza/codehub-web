@@ -1,15 +1,10 @@
 import { defineStore } from 'pinia'
-
-// interface User {
-//   id: string
-//   email: string
-//   name?: string
-// }
+import type { UserProfile } from '@/types/users'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') as string | null,
-    // user: JSON.parse(localStorage.getItem('user') || 'null') as User | null,
+    user: JSON.parse(localStorage.getItem('user') || 'null') as UserProfile | null,
   }),
 
   getters: {
@@ -17,20 +12,20 @@ export const useAuthStore = defineStore('auth', {
   },
 
    actions: {
-    login(token: string) {
+    login(token: string, user: UserProfile) {
       this.token = token
-      // this.user = user
+      this.user = user
 
       localStorage.setItem('token', token)
-      // localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('user', JSON.stringify(user))
     },
 
     logout() {
       this.token = null
-      // this.user = null
+      this.user = null
 
       localStorage.removeItem('token')
-      // localStorage.removeItem('user')
+      localStorage.removeItem('user')
     },
   },
 })

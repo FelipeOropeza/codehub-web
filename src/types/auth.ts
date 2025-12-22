@@ -1,8 +1,11 @@
-export type LoginPayload = {
+import type { UserProfile } from './users'
+
+export interface LoginPayload {
   email: string
   password: string
 }
 
-export type Response = {
+export interface Response {
   accessToken: string
+  user: UserProfile
 }

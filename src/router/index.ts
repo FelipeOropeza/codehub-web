@@ -1,12 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      component: DefaultLayout,
+      component: import('@/layouts/DefaultLayout.vue'),
       children: [
         { path: '', component: () => import('@/views/HomeView.vue') },
         { path: 'login', component: () => import('@/views/auth/LoginView.vue') },
