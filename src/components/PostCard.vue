@@ -1,27 +1,20 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
+import type { Post } from '@/types/posts'
 
 defineProps<{
-  author: string
-  language: string
-  code: string
+  post: Post
 }>()
 </script>
 
 <template>
-  <div class="border border-zinc-800 rounded-lg p-4 space-y-3">
-    <div class="flex justify-between text-sm text-zinc-400">
-      <span>@{{ author }}</span>
-      <span>{{ language }}</span>
+  <div class="border rounded-lg p-4 space-y-2">
+    <div class="text-sm text-zinc-500 flex justify-between">
+      <span>@{{ post.title }}</span>
+      <span>{{ post.language }}</span>
     </div>
 
-    <pre class="bg-zinc-900 p-3 rounded text-sm overflow-x-auto">
-<code>{{ code }}</code>
+    <pre class="bg-zinc-100 p-3 rounded text-sm overflow-x-auto">
+<code class="text-black">{{ post.code }}</code>
     </pre>
-
-    <div class="flex gap-2">
-      <Button size="sm" variant="ghost">❤️ Curtir</Button>
-      <Button size="sm" variant="ghost">💬 Comentar</Button>
-    </div>
   </div>
 </template>

@@ -8,7 +8,7 @@ export interface Response {
   message: string
 }
 
-export interface UserProfile {
+export interface User {
   id: string
   email: string
   name: string

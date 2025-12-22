@@ -1,23 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button } from '@/components/ui/button'
+import { useRouter } from 'vue-router'
 import { Input } from '@/components/ui/input'
-import { userApi } from '@/api/users'
+import { Button } from '@/components/ui/button'
+import { useUserStore } from '@/stores/user'
+
+const router = useRouter()
+const userStore = useUserStore()
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
 
 async function handleRegister() {
-  try {
-    await userApi.register({
-      name: name.value,
-      email: email.value,
-      password: password.value,
-    })
-  } catch (error) {
-    console.error(error)
-  }
+  await userStore.register({
+    name: name.value,
+    email: email.value,
+    password: password.value,
+  })
+
+  router.push('/login')
 }
 </script>
 
@@ -29,11 +31,13 @@ async function handleRegister() {
     <Input v-model="email" type="email" placeholder="Email" />
     <Input v-model="password" type="password" placeholder="Senha" />
 
-    <Button class="w-full" @click="handleRegister"> Cadastrar </Button>
+    <Button class="w-full" :disabled="userStore.loading" @click="handleRegister">
+      Cadastrar
+    </Button>
 
     <p class="text-sm text-center text-zinc-500">
       Já tem conta?
-      <RouterLink to="/login" class="underline"> Entrar </RouterLink>
+      <RouterLink to="/login" class="underline">Entrar</RouterLink>
     </p>
   </div>
 </template>

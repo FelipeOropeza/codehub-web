@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { authApi } from '@/api/auth'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
-const auth = useAuthStore()
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -18,7 +18,7 @@ async function handleLogin() {
     password: password.value,
   })
 
-  auth.login(res.data.accessToken, res.data.user)
+  authStore.login(res.data.accessToken, res.data.user)
   router.push('/')
 }
 </script>
@@ -36,9 +36,7 @@ async function handleLogin() {
 
     <p class="text-sm text-center text-zinc-500">
       Não tem conta?
-      <RouterLink to="/register" class="underline">
-        Cadastre-se
-      </RouterLink>
+      <RouterLink to="/register" class="underline">Cadastre-se</RouterLink>
     </p>
   </div>
 </template>

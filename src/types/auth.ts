@@ -1,4 +1,4 @@
-import type { UserProfile } from './users'
+import type { User } from './users'
 
 export interface LoginPayload {
   email: string
@@ -7,5 +7,5 @@ export interface LoginPayload {
 
 export interface Response {
   accessToken: string
-  user: UserProfile
+  user: User
 }

@@ -1,18 +1,18 @@
 import { defineStore } from 'pinia'
-import type { UserProfile } from '@/types/users'
+import type { User } from '@/types/users'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') as string | null,
-    user: JSON.parse(localStorage.getItem('user') || 'null') as UserProfile | null,
+    user: JSON.parse(localStorage.getItem('user') || 'null') as User | null,
   }),
 
   getters: {
     isAuthenticated: (state) => !!state.token,
   },
 
-   actions: {
-    login(token: string, user: UserProfile) {
+  actions: {
+    login(token: string, user: User) {
       this.token = token
       this.user = user
 
