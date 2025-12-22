@@ -1,21 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { authApi } from '@/api/auth'
+import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
 const auth = useAuthStore()
 
 const email = ref('')
 const password = ref('')
 
-function handleLogin() {
-  // depois você troca por API real
-  auth.login({
-    id: '1',
-    name: 'Felipe',
+async function handleLogin() {
+  const res = await authApi.login({
     email: email.value,
+    password: password.value,
   })
+
+  auth.login(res.data.accessToken)
+  router.push('/')
 }
 </script>
 
