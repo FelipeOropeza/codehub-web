@@ -6,3 +6,16 @@ export interface Post {
   createdAt: string
   authorId: string
 }
+
+export interface CreatePostPayload {
+  title: string
+  code: string
+  language: string
+}
+
+
+export interface Response{
+  message: string
+}
+
+

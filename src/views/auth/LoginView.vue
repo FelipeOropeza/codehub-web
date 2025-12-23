@@ -30,9 +30,7 @@ async function handleLogin() {
     <Input v-model="email" type="email" placeholder="Email" />
     <Input v-model="password" type="password" placeholder="Senha" />
 
-    <Button class="w-full" @click="handleLogin">
-      Login
-    </Button>
+    <Button class="w-full" @click="handleLogin"> Login </Button>
 
     <p class="text-sm text-center text-zinc-500">
       Não tem conta?
