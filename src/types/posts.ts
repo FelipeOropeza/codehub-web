@@ -1,21 +1,20 @@
-export interface Post {
-  id: string
-  title: string
-  code: string
-  language: string
-  createdAt: string
-  authorId: string
-}
-
 export interface CreatePostPayload {
   title: string
   code: string
   language: string
 }
 
+export interface PostWithAuthor {
+  id: string
+  title: string
+  code: string
+  language: string
+  createdAt: string
 
-export interface Response{
-  message: string
+  author: {
+    id: string
+    name: string
+    avatar?: string | null
+  }
 }
-
 

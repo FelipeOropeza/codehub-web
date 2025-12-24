@@ -1,12 +1,12 @@
 import api from "./api";
-import type { Post, CreatePostPayload } from "@/types/posts";
+import type { CreatePostPayload, PostWithAuthor } from "@/types/posts";
 
 export const postsApi = {
   fetchPosts() {
-    return api.get<Post[]>('/posts');
+    return api.get<PostWithAuthor[]>('/posts');
   },
 
   createPost(payload: CreatePostPayload) {
-    return api.post<Response>('/posts/create', payload);
+    return api.post<PostWithAuthor>('/posts/create', payload);
   }
 }

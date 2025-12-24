@@ -2,9 +2,14 @@
 import { onMounted } from 'vue'
 import { usePostsStore } from '@/stores/posts'
 import PostCard from '@/components/PostCard.vue'
+import { useAuthStore } from '@/stores/auth'
 import CreatePostModal from '@/components/CreatePostModal.vue'
+import { p } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
+const auth = useAuthStore()
 const postsStore = usePostsStore()
+
+console.log(postsStore.posts)
 
 onMounted(() => {
   postsStore.fetchPosts()
@@ -13,7 +18,8 @@ onMounted(() => {
 
 <template>
   <div>
-    <CreatePostModal />
+
+    <CreatePostModal v-if="auth.isAuthenticated" />
 
     <h2 class="text-2xl font-bold mb-4">
       Últimos códigos publicados
