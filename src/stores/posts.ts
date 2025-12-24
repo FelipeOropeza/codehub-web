@@ -14,7 +14,6 @@ export const usePostsStore = defineStore('posts', {
       this.loading = true
       try {
         const response = await postsApi.fetchPosts()
-        console.log(response.data)
         this.posts = response.data
       } finally {
         this.loading = false

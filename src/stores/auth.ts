@@ -13,7 +13,6 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     login(token: string, user: User) {
-      console.log('Logging in with token:', token)
       this.token = token
       this.user = user
 

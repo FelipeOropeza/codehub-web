@@ -4,12 +4,9 @@ import { usePostsStore } from '@/stores/posts'
 import PostCard from '@/components/PostCard.vue'
 import { useAuthStore } from '@/stores/auth'
 import CreatePostModal from '@/components/CreatePostModal.vue'
-import { p } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 const auth = useAuthStore()
 const postsStore = usePostsStore()
-
-console.log(postsStore.posts)
 
 onMounted(() => {
   postsStore.fetchPosts()
