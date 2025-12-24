@@ -9,7 +9,7 @@ const auth = useAuthStore()
   <header class="border-b bg-zinc-950 text-white">
     <div class="max-w-6xl mx-auto h-14 flex items-center justify-between px-4">
       <RouterLink to="/" class="font-bold text-lg">
-        CodeShare
+        CodeHub
       </RouterLink>
 
       <!-- DESLOGADO -->

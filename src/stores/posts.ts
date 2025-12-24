@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { postsApi } from '@/api/posts'
-import type { Post, CreatePostPayload } from '@/types/posts'
+import type { CreatePostPayload, PostWithAuthor } from '@/types/posts'
 
 export const usePostsStore = defineStore('posts', {
   state: () => ({
-    posts: [] as Post[],
+    posts: [] as PostWithAuthor[],
     loading: false,
     creating: false,
   }),
@@ -14,6 +14,7 @@ export const usePostsStore = defineStore('posts', {
       this.loading = true
       try {
         const response = await postsApi.fetchPosts()
+        console.log(response.data)
         this.posts = response.data
       } finally {
         this.loading = false
@@ -25,7 +26,8 @@ export const usePostsStore = defineStore('posts', {
       try {
         const response = await postsApi.createPost(payload)
 
-        console.log('Post created:', response.data)
+        this.posts.unshift(response.data)
+
         return response.data
       } finally {
         this.creating = false

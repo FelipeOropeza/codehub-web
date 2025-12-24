@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { usePostsStore } from '@/stores/posts'
+import CodeEditor from '@/components/CodeEditor.vue'
 
 import {
   Dialog,
@@ -11,7 +12,13 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const postsStore = usePostsStore()
 
@@ -21,7 +28,7 @@ const code = ref('')
 const open = ref(false)
 
 const submit = async () => {
-  if (!title.value || !language.value || !code.value) return
+  if (!title.value || !code.value || !language.value) return
 
   await postsStore.createPost({
     title: title.value,
@@ -38,29 +45,53 @@ const submit = async () => {
 
 <template>
   <Dialog v-model:open="open">
-    <!-- botão que abre o modal -->
     <DialogTrigger as-child>
       <Button class="mb-6"> + Novo post </Button>
     </DialogTrigger>
 
-    <!-- modal -->
-    <DialogContent class="sm:max-w-lg">
+    <DialogContent class="sm:max-w-5xl">
       <DialogHeader>
-        <DialogTitle> Publicar novo código </DialogTitle>
+        <DialogTitle>Publicar novo código</DialogTitle>
       </DialogHeader>
 
       <div class="space-y-4">
         <Input v-model="title" placeholder="Título" />
 
-        <Input v-model="language" placeholder="Linguagem (ex: PHP, JS)" />
+        <!-- linguagem -->
+        <div class="flex gap-2">
+          <Select v-model="language">
+            <SelectTrigger class="w-[240px]">
+              <SelectValue placeholder="Selecione a linguagem" />
+            </SelectTrigger>
 
-        <Textarea v-model="code" rows="6" placeholder="Cole seu código aqui" class="font-mono" />
+            <SelectContent>
+              <SelectItem value="PHP">PHP</SelectItem>
+              <SelectItem value="JavaScript">JavaScript</SelectItem>
+              <SelectItem value="Python">Python</SelectItem>
+              <SelectItem value="Java">Java</SelectItem>
+              <SelectItem value="C#">C#</SelectItem>
+              <SelectItem value="Outro">Outro</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <!-- se escolher "Outro" -->
+          <Input
+            v-if="language === 'Outro'"
+            v-model="language"
+            placeholder="Digite a linguagem"
+          />
+        </div>
+
+        <!-- editor genérico -->
+        <CodeEditor v-model="code" />
 
         <div class="flex justify-end gap-2">
-          <Button variant="outline" @click="open = false"> Cancelar </Button>
+          <Button variant="outline" @click="open = false">
+            Cancelar
+          </Button>
 
           <Button @click="submit" :disabled="postsStore.creating">
-            {{ postsStore.creating ? 'Publicando...' : 'Publicar' }}
+            Publicar
           </Button>
         </div>
       </div>
