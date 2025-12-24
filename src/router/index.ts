@@ -5,7 +5,7 @@ export const router = createRouter({
   routes: [
     {
       path: '/',
-      component: import('@/layouts/DefaultLayout.vue'),
+      component: () => import('@/layouts/DefaultLayout.vue'),
       children: [
         { path: '', component: () => import('@/views/HomeView.vue') },
         { path: 'login', component: () => import('@/views/auth/LoginView.vue') },
