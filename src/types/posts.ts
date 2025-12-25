@@ -19,7 +19,8 @@ export interface PostWithAuthor {
 
   _count: {
     likes: number
+    comments: number
   }
 
-  likedByMe: boolean
+  likedByMe?: boolean
 }

@@ -3,6 +3,7 @@ import type { PostWithAuthor } from '@/types/posts'
 import { usePostsStore } from '@/stores/posts'
 import { useAuthStore } from '@/stores/auth'
 import Button from './ui/button/Button.vue'
+import CommentsSection from './CommentsSection.vue'
 
 defineProps<{
   post: PostWithAuthor
@@ -71,6 +72,12 @@ const copyCode = async (code: string) => {
         </span>
 
         {{ post._count.likes }}
+      </Button>
+      <Button
+        class="text-xs text-zinc-400 hover:text-zinc-200"
+        @click="$router.push(`/posts/${post.id}`)"
+      >
+        💬 {{ post._count.comments }} comentários
       </Button>
 
       <Button

@@ -5,6 +5,7 @@ import type { CreatePostPayload, PostWithAuthor } from '@/types/posts'
 export const usePostsStore = defineStore('posts', {
   state: () => ({
     posts: [] as PostWithAuthor[],
+    currentPost: null as PostWithAuthor | null,
     loading: false,
     creating: false,
   }),
@@ -41,6 +42,11 @@ export const usePostsStore = defineStore('posts', {
 
       post.likedByMe = data.liked
       post._count.likes += data.liked ? 1 : -1
+    },
+
+    async fetchPostById(id: string) {
+      const response = await postsApi.fetchPostById(id)
+      this.currentPost = response.data
     },
   },
 })

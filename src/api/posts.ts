@@ -13,4 +13,8 @@ export const postsApi = {
   toggleLike(postId: string) {
     return api.post<{ liked: boolean }>(`/likes/${postId}`)
   },
+
+  fetchPostById(id: string) {
+    return api.get<PostWithAuthor>(`/posts/${id}`)
+  }
 }
