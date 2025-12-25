@@ -16,5 +16,10 @@ export interface PostWithAuthor {
     name: string
     avatar?: string | null
   }
-}
 
+  _count: {
+    likes: number
+  }
+
+  likedByMe: boolean
+}

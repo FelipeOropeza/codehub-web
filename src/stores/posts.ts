@@ -32,5 +32,15 @@ export const usePostsStore = defineStore('posts', {
         this.creating = false
       }
     },
+
+    async toggleLike(postId: string) {
+      const post = this.posts.find((p) => p.id === postId)
+      if (!post) return
+
+      const { data } = await postsApi.toggleLike(postId)
+
+      post.likedByMe = data.liked
+      post._count.likes += data.liked ? 1 : -1
+    },
   },
 })
