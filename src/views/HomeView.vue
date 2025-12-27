@@ -26,7 +26,7 @@ onMounted(() => {
       Feed público — qualquer pessoa pode ver 🚀
     </p>
 
-    <div v-if="postsStore.loading" class="space-y-4">
+    <div v-if="postsStore.loadingFeed" class="space-y-4">
       <div class="h-32 bg-zinc-200 animate-pulse rounded" />
       <div class="h-32 bg-zinc-200 animate-pulse rounded" />
     </div>
