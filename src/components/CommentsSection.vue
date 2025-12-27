@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useCommentsStore } from '@/stores/comments'
+import { usePostsStore } from '@/stores/posts'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{
@@ -11,10 +12,6 @@ const commentsStore = useCommentsStore()
 const authStore = useAuthStore()
 
 const content = ref('')
-
-onMounted(() => {
-  commentsStore.fetchByPost(props.postId)
-})
 
 const sendComment = async () => {
   if (!content.value.trim()) return
@@ -46,7 +43,6 @@ const sendComment = async () => {
       </button>
     </div>
 
-    <!-- lista -->
     <div
       v-for="comment in commentsStore.comments"
       :key="comment.id"

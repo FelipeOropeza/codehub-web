@@ -1,16 +1,29 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePostsStore } from '@/stores/posts'
-import CommentsSection from '@/components/CommentsSection.vue'
+import { useCommentsStore } from '@/stores/comments'
 import PostCard from '@/components/PostCard.vue'
+import CommentsSection from '@/components/CommentsSection.vue'
 
 const route = useRoute()
 const postsStore = usePostsStore()
+const commentsStore = useCommentsStore()
 
-onMounted(() => {
-  postsStore.fetchPostById(route.params.id as string)
-})
+watch(
+  () => route.params.id,
+  async (id) => {
+    if (!id) return
+
+    postsStore.currentPost = null
+    commentsStore.comments = []
+
+    await postsStore.fetchByPost(id as string)
+
+    commentsStore.fetchCommentsByPost(id as string)
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

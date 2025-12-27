@@ -11,6 +11,7 @@ export interface PostWithAuthor {
   language: string
   createdAt: string
 
+  likes?: { id: string }[]
   author: {
     id: string
     name: string

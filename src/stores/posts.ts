@@ -5,19 +5,29 @@ import type { CreatePostPayload, PostWithAuthor } from '@/types/posts'
 export const usePostsStore = defineStore('posts', {
   state: () => ({
     posts: [] as PostWithAuthor[],
+
     currentPost: null as PostWithAuthor | null,
-    loading: false,
+    currentPostId: null as PostWithAuthor | null,
+
+    loadingFeed: false,
+    loadingPost: false,
     creating: false,
   }),
 
   actions: {
+    // ===============================
+    // FEED
+    // ===============================
     async fetchPosts() {
-      this.loading = true
+      this.loadingFeed = true
       try {
         const response = await postsApi.fetchPosts()
-        this.posts = response.data
+        this.posts = response.data.map((post) => ({
+          ...post,
+          likedByMe: post.likedByMe ?? false,
+        }))
       } finally {
-        this.loading = false
+        this.loadingFeed = false
       }
     },
 
@@ -26,7 +36,10 @@ export const usePostsStore = defineStore('posts', {
       try {
         const response = await postsApi.createPost(payload)
 
-        this.posts.unshift(response.data)
+        this.posts.unshift({
+          ...response.data,
+          likedByMe: false,
+        })
 
         return response.data
       } finally {
@@ -35,18 +48,42 @@ export const usePostsStore = defineStore('posts', {
     },
 
     async toggleLike(postId: string) {
-      const post = this.posts.find((p) => p.id === postId)
-      if (!post) return
-
       const { data } = await postsApi.toggleLike(postId)
 
-      post.likedByMe = data.liked
-      post._count.likes += data.liked ? 1 : -1
+      // 1️⃣ Atualiza na lista de posts (home)
+      const postInList = this.posts.find((p) => p.id === postId)
+      if (postInList) {
+        postInList.likedByMe = data.liked
+        postInList._count.likes += data.liked ? 1 : -1
+      }
+
+      // 2️⃣ Atualiza o post solo (se estiver aberto)
+      if (this.currentPost?.id === postId) {
+        this.currentPost.likedByMe = data.liked
+        this.currentPost._count.likes += data.liked ? 1 : -1
+      }
     },
 
-    async fetchPostById(id: string) {
-      const response = await postsApi.fetchPostById(id)
-      this.currentPost = response.data
+    // ===============================
+    // POST INDIVIDUAL
+    // ===============================
+    async fetchByPost(postId: string) {
+      this.loadingPost = true
+
+      try {
+        const { data } = await postsApi.fetchPostById(postId)
+
+        data.likedByMe = Array.isArray(data.likes) && data.likes.length > 0
+
+        this.currentPost = data
+      } finally {
+        this.loadingPost = false
+      }
+    },
+
+    clearCurrentPost() {
+      this.currentPost = null
+      this.currentPostId = null
     },
   },
 })

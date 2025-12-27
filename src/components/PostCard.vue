@@ -3,7 +3,6 @@ import type { PostWithAuthor } from '@/types/posts'
 import { usePostsStore } from '@/stores/posts'
 import { useAuthStore } from '@/stores/auth'
 import Button from './ui/button/Button.vue'
-import CommentsSection from './CommentsSection.vue'
 
 defineProps<{
   post: PostWithAuthor
@@ -18,7 +17,6 @@ const copyCode = async (code: string) => {
 </script>
 
 <template>
-  {{ post.likedByMe }}
   <article class="border border-zinc-800 rounded-lg p-4 space-y-4 bg-zinc-900 text-zinc-100">
     <!-- header -->
     <header class="flex items-center justify-between">
@@ -58,28 +56,36 @@ const copyCode = async (code: string) => {
 
     <!-- ações -->
     <footer class="flex items-center justify-between pt-2 border-t border-zinc-800">
-      <Button
-        v-if="authStore.isAuthenticated"
-        @click="postsStore.toggleLike(post.id)"
-        class="flex items-center gap-2 text-sm transition-all"
-        :class="{
-          'text-red-500 scale-105': post.likedByMe,
-          'text-zinc-400 hover:text-zinc-200': !post.likedByMe,
-        }"
-      >
-        <span class="text-lg leading-none">
-          {{ post.likedByMe ? '❤️' : '🤍' }}
-        </span>
+      <!-- esquerda: likes + comentários -->
+      <div class="flex items-center gap-4">
+        <!-- LIKE -->
+        <Button
+          :disabled="!authStore.isAuthenticated"
+          @click="authStore.isAuthenticated && postsStore.toggleLike(post.id)"
+          class="flex items-center gap-2 text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="{
+            'text-red-500 scale-105': post.likedByMe,
+            'text-zinc-400 hover:text-zinc-200': !post.likedByMe,
+          }"
+        >
+          <span class="text-lg leading-none">
+            {{ post.likedByMe ? '❤️' : '🤍' }}
+          </span>
 
-        {{ post._count.likes }}
-      </Button>
-      <Button
-        class="text-xs text-zinc-400 hover:text-zinc-200"
-        @click="$router.push(`/posts/${post.id}`)"
-      >
-        💬 {{ post._count.comments }} comentários
-      </Button>
+          {{ post._count.likes }}
+        </Button>
 
+        <!-- COMENTÁRIOS -->
+        <Button
+          class="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200"
+          @click="$router.push(`/posts/${post.id}`)"
+        >
+          💬 {{ post._count.comments }}
+          <span class="hidden sm:inline">comentários</span>
+        </Button>
+      </div>
+
+      <!-- direita: copiar -->
       <Button
         @click="copyCode(post.code)"
         class="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 transition"

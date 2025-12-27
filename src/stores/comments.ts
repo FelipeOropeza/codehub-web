@@ -10,16 +10,6 @@ export const useCommentsStore = defineStore('comments', {
   }),
 
   actions: {
-    async fetchByPost(postId: string) {
-      this.loading = true
-      try {
-        const response = await commentsApi.fetchByPost(postId)
-        this.comments = response.data
-      } finally {
-        this.loading = false
-      }
-    },
-
     async createComment(payload: CreateCommentPayload) {
       this.creating = true
       try {
@@ -34,6 +24,16 @@ export const useCommentsStore = defineStore('comments', {
     async deleteComment(commentId: string) {
       await commentsApi.delete(commentId)
       this.comments = this.comments.filter(c => c.id !== commentId)
+    },
+
+    async fetchCommentsByPost(postId: string) {
+      this.loading = true
+      try {
+        const response = await commentsApi.fetchByPost(postId)
+        this.comments = response.data
+      } finally {
+        this.loading = false
+      }
     },
   },
 })

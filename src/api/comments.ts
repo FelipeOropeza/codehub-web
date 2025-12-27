@@ -3,7 +3,7 @@ import type { Comment, CreateCommentPayload } from '@/types/comments'
 
 export const commentsApi = {
   fetchByPost(postId: string) {
-    return api.get<Comment[]>(`/comments/post/${postId}`)
+    return api.get<Comment[]>(`/comments/${postId}`)
   },
 
   create(payload: CreateCommentPayload) {
