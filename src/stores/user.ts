@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { userApi } from '@/api/users'
-import type { Response, RegisterPayload } from '@/types/users'
-
+import type { Response, RegisterPayload, UpdateProfilePayload, User } from '@/types/users'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     loading: false,
+    user: null as User | null,
   }),
 
   actions: {
@@ -17,6 +17,13 @@ export const useUserStore = defineStore('user', {
       } finally {
         this.loading = false
       }
+    },
+
+    async updateProfile(payload: UpdateProfilePayload) {
+      const { data } = await userApi.updateProfile(payload)
+      this.user = data
+
+      localStorage.setItem('user', JSON.stringify(data))
     },
   },
 })

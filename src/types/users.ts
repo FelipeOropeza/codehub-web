@@ -13,5 +13,12 @@ export interface User {
   email: string
   name: string
   bio?: string
-  avatarUrl?: string
+  avatar?: string
+}
+
+export interface UpdateProfilePayload {
+  name?: string
+  bio?: string
+  avatar?: string
+  email?: string
 }

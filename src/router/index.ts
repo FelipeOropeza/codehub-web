@@ -13,7 +13,11 @@ export const router = createRouter({
         {
           path: 'posts/:id',
           component: () => import('@/views/PostDetailsView.vue'),
-        }
+        },
+        {
+          path: 'profile',
+          component: () => import('@/views/ProfileView.vue'),
+        },
       ],
     },
   ],
