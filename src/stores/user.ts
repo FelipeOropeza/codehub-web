@@ -19,10 +19,9 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async updateProfile(payload: UpdateProfilePayload) {
+    async updateProfile(payload: FormData) {
       const { data } = await userApi.updateProfile(payload)
       this.user = data
-
       localStorage.setItem('user', JSON.stringify(data))
     },
   },

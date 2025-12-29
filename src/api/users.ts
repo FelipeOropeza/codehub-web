@@ -6,7 +6,11 @@ export const userApi = {
     return api.post<Response>('/users/register', payload)
   },
 
-  updateProfile(payload: UpdateProfilePayload) {
-    return api.patch<User>('/users/me', payload)
-  }
+  updateProfile(payload: FormData) {
+    return api.patch<User>('/users/me', payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+  },
 }

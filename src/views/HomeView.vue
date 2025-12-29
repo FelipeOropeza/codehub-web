@@ -11,6 +11,7 @@ const postsStore = usePostsStore()
 onMounted(() => {
   postsStore.fetchPosts()
 })
+
 </script>
 
 <template>
