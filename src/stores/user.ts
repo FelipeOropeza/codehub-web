@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { userApi } from '@/api/users'
-import type { Response, RegisterPayload, UpdateProfilePayload, User } from '@/types/users'
+import type { Response, RegisterPayload, User } from '@/types/users'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -19,10 +19,9 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async updateProfile(payload: FormData) {
+    async updateProfile(payload: FormData): Promise<User> {
       const { data } = await userApi.updateProfile(payload)
-      this.user = data
-      localStorage.setItem('user', JSON.stringify(data))
+      return data
     },
   },
 })

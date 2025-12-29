@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
 
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-vue-next'
 
+const authStore = useAuthStore()
 const userStore = useUserStore()
 
 const form = ref({
@@ -23,7 +25,7 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const loading = ref(false)
 
 watch(
-  () => userStore.user,
+  () => authStore.user,
   (user) => {
     if (user) {
       form.value.name = user.name || ''
@@ -58,7 +60,10 @@ const submit = async () => {
       formData.append('avatar', avatarFile.value)
     }
 
-    await userStore.updateProfile(formData)
+    const updatedUser = await userStore.updateProfile(formData)
+
+    // 🔥 ATUALIZA O USUÁRIO GLOBAL DO SITE
+    authStore.updateUser(updatedUser)
   } finally {
     loading.value = false
   }
@@ -66,8 +71,8 @@ const submit = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background-black text-foreground px-4 py-12">
-    <div class="max-w-2xl mx-auto">
+  <div class="bg-background-black text-foreground px-4">
+    <div class="max-w-2xl mx-auto mt-10">
       <Card class="bg-zinc-900 border-zinc-800 shadow-xl">
         <CardHeader>
           <CardTitle class="text-white">Meu perfil</CardTitle>
@@ -77,7 +82,6 @@ const submit = async () => {
         </CardHeader>
 
         <CardContent class="space-y-8">
-          <!-- Avatar -->
           <!-- Avatar -->
           <div class="flex items-center gap-6">
             <img
