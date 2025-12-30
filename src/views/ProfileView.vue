@@ -62,12 +62,13 @@ const submit = async () => {
 
     const updatedUser = await userStore.updateProfile(formData)
 
-    // 🔥 ATUALIZA O USUÁRIO GLOBAL DO SITE
+    // 🔥 ATUALIZA O USUÁRIO GLOBAL (NAV, POSTS, ETC)
     authStore.updateUser(updatedUser)
   } finally {
     loading.value = false
   }
 }
+
 </script>
 
 <template>

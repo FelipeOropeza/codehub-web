@@ -13,4 +13,8 @@ export const userApi = {
       },
     })
   },
+
+  getById(userId: string) {
+    return api.get<User>(`/users/${userId}`)
+  },
 }

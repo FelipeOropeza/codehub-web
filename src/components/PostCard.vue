@@ -2,6 +2,7 @@
 import type { PostWithAuthor } from '@/types/posts'
 import { usePostsStore } from '@/stores/posts'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 import Button from './ui/button/Button.vue'
 
 defineProps<{
@@ -10,9 +11,14 @@ defineProps<{
 
 const authStore = useAuthStore()
 const postsStore = usePostsStore()
+const router = useRouter()
 
 const copyCode = async (code: string) => {
   await navigator.clipboard.writeText(code)
+}
+
+const goToProfile = (userId: string) => {
+  router.push({ name: 'user.profile', params: { id: userId } })
 }
 </script>
 
@@ -20,17 +26,27 @@ const copyCode = async (code: string) => {
   <article class="border border-zinc-800 rounded-lg p-4 space-y-4 bg-zinc-900 text-zinc-100">
     <!-- header -->
     <header class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img v-if="post.author.avatar" :src="post.author.avatar" class="w-8 h-8 rounded-full" />
+      <!-- autor -->
+      <div
+        class="flex items-center gap-3 cursor-pointer group"
+        @click="goToProfile(post.author.id)"
+      >
+        <!-- avatar -->
+        <img
+          v-if="post.author.avatar"
+          :src="post.author.avatar"
+          class="w-8 h-8 rounded-full object-cover border border-zinc-700 group-hover:opacity-80 transition"
+        />
         <div
           v-else
-          class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium"
+          class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium group-hover:bg-zinc-600 transition"
         >
           {{ post.author.name.charAt(0).toUpperCase() }}
         </div>
 
+        <!-- nome + data -->
         <div class="leading-tight">
-          <p class="text-sm font-medium">
+          <p class="text-sm font-medium group-hover:underline">
             {{ post.author.name }}
           </p>
           <p class="text-xs text-zinc-400">
@@ -39,6 +55,7 @@ const copyCode = async (code: string) => {
         </div>
       </div>
 
+      <!-- linguagem -->
       <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300 font-mono">
         {{ post.language }}
       </span>
@@ -56,7 +73,7 @@ const copyCode = async (code: string) => {
 
     <!-- ações -->
     <footer class="flex items-center justify-between pt-2 border-t border-zinc-800">
-      <!-- esquerda: likes + comentários -->
+      <!-- esquerda -->
       <div class="flex items-center gap-4">
         <!-- LIKE -->
         <Button
@@ -71,7 +88,6 @@ const copyCode = async (code: string) => {
           <span class="text-lg leading-none">
             {{ post.likedByMe ? '❤️' : '🤍' }}
           </span>
-
           {{ post._count.likes }}
         </Button>
 
@@ -85,7 +101,7 @@ const copyCode = async (code: string) => {
         </Button>
       </div>
 
-      <!-- direita: copiar -->
+      <!-- direita -->
       <Button
         @click="copyCode(post.code)"
         class="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 transition"
