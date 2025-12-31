@@ -22,3 +22,10 @@ export interface UpdateProfilePayload {
   avatar?: string
   email?: string
 }
+
+export interface RegisterErrors {
+  name?: string
+  email?: string
+  password?: string
+  form?: string
+}
