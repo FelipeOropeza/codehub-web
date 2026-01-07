@@ -5,6 +5,7 @@ import type { CreatePostPayload, PostWithAuthor } from '@/types/posts'
 export const usePostsStore = defineStore('posts', {
   state: () => ({
     posts: [] as PostWithAuthor[],
+    postsUser: [] as PostWithAuthor[],
 
     currentPost: null as PostWithAuthor | null,
     currentPostId: null as PostWithAuthor | null,
@@ -15,9 +16,6 @@ export const usePostsStore = defineStore('posts', {
   }),
 
   actions: {
-    // ===============================
-    // FEED
-    // ===============================
     async fetchPosts() {
       this.loadingFeed = true
       try {
@@ -50,23 +48,25 @@ export const usePostsStore = defineStore('posts', {
     async toggleLike(postId: string) {
       const { data } = await postsApi.toggleLike(postId)
 
-      // 1️⃣ Atualiza na lista de posts (home)
-      const postInList = this.posts.find((p) => p.id === postId)
-      if (postInList) {
-        postInList.likedByMe = data.liked
-        postInList._count.likes += data.liked ? 1 : -1
+      const updatePost = (post: PostWithAuthor) => {
+        post.likedByMe = data.liked
+        post._count.likes += data.liked ? 1 : -1
       }
 
-      // 2️⃣ Atualiza o post solo (se estiver aberto)
+      // Feed
+      const postInFeed = this.posts.find((p) => p.id === postId)
+      if (postInFeed) updatePost(postInFeed)
+
+      // Perfil
+      const postInUser = this.postsUser.find((p) => p.id === postId)
+      if (postInUser) updatePost(postInUser)
+
+      // Post individual
       if (this.currentPost?.id === postId) {
-        this.currentPost.likedByMe = data.liked
-        this.currentPost._count.likes += data.liked ? 1 : -1
+        updatePost(this.currentPost)
       }
     },
 
-    // ===============================
-    // POST INDIVIDUAL
-    // ===============================
     async fetchByPost(postId: string) {
       this.loadingPost = true
 
@@ -78,6 +78,20 @@ export const usePostsStore = defineStore('posts', {
         this.currentPost = data
       } finally {
         this.loadingPost = false
+      }
+    },
+
+    async fetchPostsByUser(userId: string) {
+      this.loadingFeed = true
+      try {
+        const response = await postsApi.fetchPostsByUser(userId)
+
+        this.postsUser = response.data.map((post) => ({
+          ...post,
+          likedByMe: post.likedByMe ?? false,
+        }))
+      } finally {
+        this.loadingFeed = false
       }
     },
 

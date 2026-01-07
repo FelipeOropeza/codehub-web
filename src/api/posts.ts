@@ -6,6 +6,10 @@ export const postsApi = {
     return api.get<PostWithAuthor[]>('/posts')
   },
 
+  fetchPostsByUser(userId: string) {
+    return api.get<PostWithAuthor[]>(`/posts/user/${userId}`)
+  },
+
   createPost(payload: CreatePostPayload) {
     return api.post<PostWithAuthor>('/posts/create', payload)
   },
@@ -16,5 +20,5 @@ export const postsApi = {
 
   fetchPostById(id: string) {
     return api.get<PostWithAuthor>(`/posts/${id}`)
-  }
+  },
 }
