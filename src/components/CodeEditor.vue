@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { EditorState } from '@codemirror/state'
 import { EditorView, basicSetup } from 'codemirror'
 import { keymap } from '@codemirror/view'
@@ -9,7 +9,9 @@ const props = defineProps<{
   modelValue: string
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+}>()
 
 const editor = ref<EditorView | null>(null)
 const container = ref<HTMLDivElement | null>(null)
@@ -43,6 +45,23 @@ onMounted(() => {
   })
 })
 
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (!editor.value) return
+    const current = editor.value.state.doc.toString()
+    if (value !== current) {
+      editor.value.dispatch({
+        changes: {
+          from: 0,
+          to: current.length,
+          insert: value,
+        },
+      })
+    }
+  }
+)
+
 onBeforeUnmount(() => {
   editor.value?.destroy()
 })
@@ -52,5 +71,5 @@ onBeforeUnmount(() => {
   <div
     ref="container"
     class="border rounded-md text-sm bg-background"
-  />
+  ></div>
 </template>

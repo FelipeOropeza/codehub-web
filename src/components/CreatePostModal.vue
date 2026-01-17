@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { z } from 'zod'
+import { useForm, useField } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
 import { usePostsStore } from '@/stores/posts'
+
 import CodeEditor from '@/components/CodeEditor.vue'
 
 import {
@@ -21,26 +25,58 @@ import {
 } from '@/components/ui/select'
 
 const postsStore = usePostsStore()
-
-const title = ref('')
-const language = ref('')
-const code = ref('')
 const open = ref(false)
 
-const submit = async () => {
-  if (!title.value || !code.value || !language.value) return
+/* ===============================
+   ZOD SCHEMA (PORTUGUÊS)
+================================ */
+const postSchema = toTypedSchema(
+  z.object({
+    title: z
+      .string()
+      .min(1, 'O título é obrigatório')
+      .max(100, 'O título é muito longo'),
 
-  await postsStore.createPost({
-    title: title.value,
-    code: code.value,
-    language: language.value,
+    language: z
+      .string()
+      .min(1, 'A linguagem é obrigatória'),
+
+    code: z
+      .string()
+      .min(10, 'O código deve ter pelo menos 10 caracteres'),
   })
+)
 
-  title.value = ''
-  language.value = ''
-  code.value = ''
+/* ===============================
+   FORM (valores iniciais)
+================================ */
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: postSchema,
+  initialValues: {
+    title: '',
+    language: '',
+    code: '',
+  },
+})
+
+const { value: title, errorMessage: titleError } =
+  useField<string>('title')
+
+const { value: language, errorMessage: languageError } =
+  useField<string>('language')
+
+const { value: code, errorMessage: codeError } =
+  useField<string>('code')
+
+/* ===============================
+   SUBMIT
+================================ */
+const submit = handleSubmit(async (values) => {
+  await postsStore.createPost(values)
+
+  resetForm()
   open.value = false
-}
+})
 </script>
 
 <template>
@@ -54,27 +90,39 @@ const submit = async () => {
         <DialogTitle>Publicar novo código</DialogTitle>
       </DialogHeader>
 
-      <div class="space-y-4">
-        <Input v-model="title" placeholder="Título" />
+      <form class="space-y-4" @submit.prevent="submit">
+        <!-- TÍTULO -->
+        <div>
+          <Input v-model="title" placeholder="Título" />
+          <p v-if="titleError" class="text-sm text-red-500 mt-1">
+            {{ titleError }}
+          </p>
+        </div>
 
-        <!-- linguagem -->
-        <div class="flex gap-2">
-          <Select v-model="language">
-            <SelectTrigger class="w-[240px]">
-              <SelectValue placeholder="Selecione a linguagem" />
-            </SelectTrigger>
+        <!-- LINGUAGEM -->
+        <div class="flex gap-2 items-start">
+          <div>
+            <Select v-model="language">
+              <SelectTrigger class="w-[240px]">
+                <SelectValue placeholder="Selecione a linguagem" />
+              </SelectTrigger>
 
-            <SelectContent>
-              <SelectItem value="PHP">PHP</SelectItem>
-              <SelectItem value="JavaScript">JavaScript</SelectItem>
-              <SelectItem value="Python">Python</SelectItem>
-              <SelectItem value="Java">Java</SelectItem>
-              <SelectItem value="C#">C#</SelectItem>
-              <SelectItem value="Outro">Outro</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="PHP">PHP</SelectItem>
+                <SelectItem value="JavaScript">JavaScript</SelectItem>
+                <SelectItem value="Python">Python</SelectItem>
+                <SelectItem value="Java">Java</SelectItem>
+                <SelectItem value="C#">C#</SelectItem>
+                <SelectItem value="Outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <!-- se escolher "Outro" -->
+            <p v-if="languageError" class="text-sm text-red-500 mt-1">
+              {{ languageError }}
+            </p>
+          </div>
+
+          <!-- SE FOR OUTRO -->
           <Input
             v-if="language === 'Outro'"
             v-model="language"
@@ -82,19 +130,32 @@ const submit = async () => {
           />
         </div>
 
-        <!-- editor genérico -->
-        <CodeEditor v-model="code" />
+        <!-- CODE -->
+        <div>
+          <CodeEditor v-model="code" />
+          <p v-if="codeError" class="text-sm text-red-500 mt-1">
+            {{ codeError }}
+          </p>
+        </div>
 
+        <!-- AÇÕES -->
         <div class="flex justify-end gap-2">
-          <Button variant="outline" @click="open = false">
+          <Button
+            type="button"
+            variant="outline"
+            @click="open = false"
+          >
             Cancelar
           </Button>
 
-          <Button @click="submit" :disabled="postsStore.creating">
+          <Button
+            type="submit"
+            :disabled="postsStore.creating"
+          >
             Publicar
           </Button>
         </div>
-      </div>
+      </form>
     </DialogContent>
   </Dialog>
 </template>
