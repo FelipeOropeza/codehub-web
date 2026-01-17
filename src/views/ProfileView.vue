@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useUserStore } from '@/stores/user'
+import { useUpdateProfile } from '@/queries/useUserQuery'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
-const userStore = useUserStore()
+const { mutateAsync: updateProfile, isPending } = useUpdateProfile()
 
 const form = ref({
   name: '',
@@ -21,8 +21,6 @@ const form = ref({
 const avatarFile = ref<File | null>(null)
 const avatarPreview = ref<string | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
-
-const loading = ref(false)
 
 watch(
   () => authStore.user,
@@ -49,26 +47,19 @@ const onAvatarChange = (e: Event) => {
 }
 
 const submit = async () => {
-  loading.value = true
+  const formData = new FormData()
+  formData.append('name', form.value.name)
+  formData.append('bio', form.value.bio)
 
-  try {
-    const formData = new FormData()
-    formData.append('name', form.value.name)
-    formData.append('bio', form.value.bio)
-
-    if (avatarFile.value) {
-      formData.append('avatar', avatarFile.value)
-    }
-
-    const updatedUser = await userStore.updateProfile(formData)
-
-    // 🔥 ATUALIZA O USUÁRIO GLOBAL (NAV, POSTS, ETC)
-    authStore.updateUser(updatedUser)
-  } finally {
-    loading.value = false
+  if (avatarFile.value) {
+    formData.append('avatar', avatarFile.value)
   }
-}
 
+  const updatedUser = await updateProfile(formData)
+
+  // 🔥 mantém o auth sincronizado
+  authStore.updateUser(updatedUser)
+}
 </script>
 
 <template>
@@ -133,10 +124,10 @@ const submit = async () => {
           <div class="flex justify-end">
             <Button
               @click="submit"
-              :disabled="loading"
+              :disabled="isPending"
               class="bg-indigo-600 hover:bg-indigo-500 text-white gap-2"
             >
-              <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
+              <Loader2 v-if="isPending" class="w-4 h-4 animate-spin" />
               Salvar alterações
             </Button>
           </div>
