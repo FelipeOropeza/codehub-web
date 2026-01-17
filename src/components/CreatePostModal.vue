@@ -3,7 +3,8 @@ import { ref } from 'vue'
 import { z } from 'zod'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
-import { usePostsStore } from '@/stores/posts'
+
+import { useCreatePost } from '@/queries/usePostsQuery'
 
 import CodeEditor from '@/components/CodeEditor.vue'
 
@@ -24,8 +25,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const postsStore = usePostsStore()
+/* ===============================
+   STATE
+================================ */
 const open = ref(false)
+
+const { mutateAsync: createPost, isPending } = useCreatePost()
 
 /* ===============================
    ZOD SCHEMA (PORTUGUÊS)
@@ -48,7 +53,7 @@ const postSchema = toTypedSchema(
 )
 
 /* ===============================
-   FORM (valores iniciais)
+   FORM
 ================================ */
 const { handleSubmit, resetForm } = useForm({
   validationSchema: postSchema,
@@ -72,7 +77,7 @@ const { value: code, errorMessage: codeError } =
    SUBMIT
 ================================ */
 const submit = handleSubmit(async (values) => {
-  await postsStore.createPost(values)
+  await createPost(values)
 
   resetForm()
   open.value = false
@@ -150,9 +155,9 @@ const submit = handleSubmit(async (values) => {
 
           <Button
             type="submit"
-            :disabled="postsStore.creating"
+            :disabled="isPending"
           >
-            Publicar
+            {{ isPending ? 'Publicando...' : 'Publicar' }}
           </Button>
         </div>
       </form>
