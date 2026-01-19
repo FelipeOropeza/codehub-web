@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
-import { useFollowStore } from '@/stores/follow'
 
 import { useUser } from '@/queries/useUserQuery'
 import { usePostsByUser } from '@/queries/usePostsQuery'
+import { useFollowCounts } from '@/queries/useFollowQuery'
 
 import FollowButton from '@/components/FollowButton.vue'
 import PostCard from '@/components/PostCard.vue'
 
+/* ===============================
+   SETUP
+================================ */
 const route = useRoute()
 const authStore = useAuthStore()
-const followStore = useFollowStore()
 
 const userId = route.params.id as string
 
@@ -22,6 +24,7 @@ const userId = route.params.id as string
 ================================ */
 const { data: user, isLoading: userLoading } = useUser(userId)
 const { data: posts, isLoading: postsLoading } = usePostsByUser(userId)
+const { data: followCounts } = useFollowCounts(userId)
 
 /* ===============================
    COMPUTEDS
@@ -29,24 +32,12 @@ const { data: posts, isLoading: postsLoading } = usePostsByUser(userId)
 const isOwnProfile = computed(() => {
   return authStore.user?.id === userId
 })
-
-/* ===============================
-   FOLLOW (mantém Pinia)
-================================ */
-watch(
-  () => userId,
-  async () => {
-    if (!isOwnProfile.value && authStore.isAuthenticated) {
-      await followStore.checkIsFollowing(userId)
-      await followStore.loadCounts(userId)
-    }
-  },
-  { immediate: true },
-)
 </script>
+
 <template>
   <div class="bg-background-black text-foreground px-4">
     <div class="max-w-2xl mx-auto mt-10 space-y-8">
+
       <!-- HEADER -->
       <div class="flex items-center gap-6">
         <img
@@ -63,34 +54,50 @@ watch(
             {{ user?.bio }}
           </p>
 
-          <FollowButton v-if="!isOwnProfile && authStore.isAuthenticated" :user-id="userId" />
+          <!-- FOLLOW BUTTON -->
+          <FollowButton
+            v-if="!isOwnProfile && authStore.isAuthenticated"
+            :user-id="userId"
+          />
         </div>
       </div>
 
       <!-- STATS -->
       <div class="flex gap-6 text-sm text-zinc-300">
         <span>
-          <strong>{{ followStore.followersCount }}</strong> seguidores
+          <strong>{{ followCounts?.followers ?? 0 }}</strong> seguidores
         </span>
         <span>
-          <strong>{{ followStore.followingCount }}</strong> seguindo
+          <strong>{{ followCounts?.following ?? 0 }}</strong> seguindo
         </span>
       </div>
 
       <!-- POSTS -->
       <div class="space-y-4">
-        <h2 class="text-lg font-semibold text-white">Postagens</h2>
+        <h2 class="text-lg font-semibold text-white">
+          Postagens
+        </h2>
 
-        <div v-if="postsLoading" class="text-zinc-400">Carregando postagens...</div>
+        <div v-if="postsLoading" class="text-zinc-400">
+          Carregando postagens...
+        </div>
 
-        <div v-else-if="posts?.length === 0" class="text-zinc-500">
+        <div
+          v-else-if="posts?.length === 0"
+          class="text-zinc-500"
+        >
           Este usuário ainda não publicou nada.
         </div>
 
         <div v-else class="space-y-4">
-          <PostCard v-for="post in posts" :key="post.id" :post="post" />
+          <PostCard
+            v-for="post in posts"
+            :key="post.id"
+            :post="post"
+          />
         </div>
       </div>
+
     </div>
   </div>
 </template>
