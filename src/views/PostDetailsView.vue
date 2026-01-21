@@ -1,35 +1,23 @@
 <script setup lang="ts">
-import { watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { usePostsStore } from '@/stores/posts'
-import { useCommentsStore } from '@/stores/comments'
+import { usePostById } from '@/queries/usePostsQuery'
+
 import PostCard from '@/components/PostCard.vue'
 import CommentsSection from '@/components/CommentsSection.vue'
 
 const route = useRoute()
-const postsStore = usePostsStore()
-const commentsStore = useCommentsStore()
+const postId = route.params.id as string
 
-watch(
-  () => route.params.id,
-  async (id) => {
-    if (!id) return
-
-    postsStore.currentPost = null
-    commentsStore.comments = []
-
-    await postsStore.fetchByPost(id as string)
-
-    commentsStore.fetchCommentsByPost(id as string)
-  },
-  { immediate: true },
-)
+const { data: post, isLoading } = usePostById(postId)
 </script>
 
 <template>
-  <div v-if="postsStore.currentPost" class="space-y-6">
-    <PostCard :post="postsStore.currentPost" />
+  <div v-if="isLoading" class="text-zinc-400">
+    Carregando...
+  </div>
 
-    <CommentsSection :postId="postsStore.currentPost.id" />
+  <div v-else-if="post" class="space-y-6">
+    <PostCard :post="post" />
+    <CommentsSection :postId="post.id" />
   </div>
 </template>

@@ -26,15 +26,18 @@ export function usePosts() {
 }
 
 /* ===============================
-   POST INDIVIDUAL
+   POST INDIVIDUAL (BY ID) ✅
 ================================ */
-export function usePost(postId: string) {
+export function usePostById(postId: string) {
   return useQuery<PostWithAuthor>({
     queryKey: POST_KEY(postId),
     queryFn: async () => {
       const { data } = await postsApi.fetchPostById(postId)
-      data.likedByMe = Array.isArray(data.likes) && data.likes.length > 0
-      return data
+
+      return {
+        ...data,
+        likedByMe: Array.isArray(data.likes) && data.likes.length > 0,
+      }
     },
     enabled: !!postId,
   })
@@ -109,7 +112,7 @@ export function useToggleLike() {
       )
 
       queryClient.setQueryData<PostWithAuthor>(
-        ['post', postId],
+        POST_KEY(postId),
         (post) =>
           post
             ? {
