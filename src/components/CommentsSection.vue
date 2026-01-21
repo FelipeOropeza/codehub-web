@@ -1,22 +1,31 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useCommentsStore } from '@/stores/comments'
-import { usePostsStore } from '@/stores/posts'
 import { useAuthStore } from '@/stores/auth'
+
+import {
+  useCommentsByPost,
+  useCreateComment,
+  useDeleteComment,
+} from '@/queries/useCommentsQuery'
 
 const props = defineProps<{
   postId: string
 }>()
 
-const commentsStore = useCommentsStore()
 const authStore = useAuthStore()
-
 const content = ref('')
 
+const { data: comments } = useCommentsByPost(props.postId)
+const { mutateAsync: createComment, isPending } = useCreateComment()
+const { mutate: deleteComment } = useDeleteComment(props.postId)
+
+/* ===============================
+   ACTIONS
+================================ */
 const sendComment = async () => {
   if (!content.value.trim()) return
 
-  await commentsStore.createComment({
+  await createComment({
     postId: props.postId,
     content: content.value,
   })
@@ -27,7 +36,7 @@ const sendComment = async () => {
 
 <template>
   <section class="space-y-4 mt-4">
-    <!-- criar comentário -->
+    <!-- CREATE -->
     <div v-if="authStore.isAuthenticated" class="flex gap-2">
       <input
         v-model="content"
@@ -36,15 +45,16 @@ const sendComment = async () => {
       />
       <button
         @click="sendComment"
-        :disabled="commentsStore.creating"
+        :disabled="isPending"
         class="px-4 py-2 bg-zinc-700 rounded text-sm hover:bg-zinc-600 disabled:opacity-50"
       >
         Enviar
       </button>
     </div>
 
+    <!-- LIST -->
     <div
-      v-for="comment in commentsStore.comments"
+      v-for="comment in comments"
       :key="comment.id"
       class="flex gap-3"
     >
@@ -71,7 +81,7 @@ const sendComment = async () => {
 
       <button
         v-if="authStore.user?.id === comment.author.id"
-        @click="commentsStore.deleteComment(comment.id)"
+        @click="deleteComment(comment.id)"
         class="text-xs text-red-400 hover:text-red-500"
       >
         excluir
