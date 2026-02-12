@@ -1,12 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { userApi } from '@/api/users'
-import type { User } from '@/types/users'
+import type { User, RegisterPayload } from '@/types/users'
+import axios from 'axios'
 
 /* ===============================
    QUERY KEYS
 ================================ */
 const USER_KEY = (id: string) => ['user', id]
 const ME_KEY = ['me']
+
+/* ===============================
+   REGISTRO
+================================ */
+export function useRegister() {
+  return useMutation({
+    mutationFn: (payload: RegisterPayload) => userApi.register(payload).then((res) => res.data),
+  })
+}
 
 /* ===============================
    USUÁRIO POR ID (perfil público)
@@ -29,18 +39,11 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: FormData) =>
-      userApi.updateProfile(payload).then(res => res.data),
+    mutationFn: (payload: FormData) => userApi.updateProfile(payload).then((res) => res.data),
 
     onSuccess: (updatedUser: User) => {
-      // Atualiza cache do "me"
       queryClient.setQueryData<User>(ME_KEY, updatedUser)
-
-      // Atualiza cache do user público
-      queryClient.setQueryData<User>(
-        USER_KEY(updatedUser.id),
-        updatedUser
-      )
+      queryClient.setQueryData<User>(USER_KEY(updatedUser.id), updatedUser)
     },
   })
 }
