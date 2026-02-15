@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import PostCard from '@/components/PostCard.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -8,14 +8,23 @@ import { Button } from '@/components/ui/button'
 
 const auth = useAuthStore()
 const page = ref(1)
-const { data: posts, isLoading, isFetching } = usePosts(page)
+
+const { data: posts, isLoading, isPlaceholderData } = usePosts(page)
+
+watch(page, () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+})
+
 </script>
 
 <template>
   <div>
     <CreatePostModal v-if="auth.isAuthenticated" />
 
-    <h2 class="text-2xl font-bold mb-4">Últimos códigos publicados</h2>
+    <h2 ref="feedTitleRef" class="text-2xl font-bold mb-4">Últimos códigos publicados</h2>
 
     <p class="text-zinc-400 mb-4">Feed público — qualquer pessoa pode ver 🚀</p>
 
@@ -33,7 +42,7 @@ const { data: posts, isLoading, isFetching } = usePosts(page)
       <span class="font-medium text-sm">Página {{ page }}</span>
       <Button
         @click="page++"
-        :disabled="isFetching || (posts && posts.length < 10)"
+        :disabled="isPlaceholderData || (posts && posts.length < 10)"
         variant="secondary"
       >
         Próxima Página

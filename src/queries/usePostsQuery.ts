@@ -15,7 +15,7 @@ const USER_POSTS_KEY = (userId: string) => ['user-posts', userId]
 ================================ */
 export function usePosts(page: Ref<number>) {
   return useQuery<PostWithAuthor[]>({
-    queryKey: [POSTS_KEY, page],
+    queryKey: ['posts', page],
     queryFn: async () => {
       const { data } = await postsApi.fetchPosts({ page: page.value })
       return data.map((post) => ({
@@ -23,7 +23,6 @@ export function usePosts(page: Ref<number>) {
         likedByMe: post.likedByMe ?? false,
       }))
     },
-    placeholderData: (previousData) => previousData,
   })
 }
 
@@ -88,8 +87,7 @@ export function useToggleLike() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (postId: string) =>
-      postsApi.toggleLike(postId).then((res) => res.data),
+    mutationFn: (postId: string) => postsApi.toggleLike(postId).then((res) => res.data),
 
     onSuccess: (data, postId) => {
       const update = (posts?: PostWithAuthor[]) =>
@@ -103,29 +101,24 @@ export function useToggleLike() {
                   likes: post._count.likes + (data.liked ? 1 : -1),
                 },
               }
-            : post
+            : post,
         )
 
       queryClient.setQueryData<PostWithAuthor[]>(POSTS_KEY, update)
 
-      queryClient.setQueriesData<PostWithAuthor[]>(
-        { queryKey: ['user-posts'] },
-        update
-      )
+      queryClient.setQueriesData<PostWithAuthor[]>({ queryKey: ['user-posts'] }, update)
 
-      queryClient.setQueryData<PostWithAuthor>(
-        POST_KEY(postId),
-        (post) =>
-          post
-            ? {
-                ...post,
-                likedByMe: data.liked,
-                _count: {
-                  ...post._count,
-                  likes: post._count.likes + (data.liked ? 1 : -1),
-                },
-              }
-            : post
+      queryClient.setQueryData<PostWithAuthor>(POST_KEY(postId), (post) =>
+        post
+          ? {
+              ...post,
+              likedByMe: data.liked,
+              _count: {
+                ...post._count,
+                likes: post._count.likes + (data.liked ? 1 : -1),
+              },
+            }
+          : post,
       )
     },
   })
