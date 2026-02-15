@@ -1,3 +1,4 @@
+import { type Ref } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { postsApi } from '@/api/posts'
 import type { CreatePostPayload, PostWithAuthor } from '@/types/posts'
@@ -12,16 +13,17 @@ const USER_POSTS_KEY = (userId: string) => ['user-posts', userId]
 /* ===============================
    FEED
 ================================ */
-export function usePosts() {
+export function usePosts(page: Ref<number>) {
   return useQuery<PostWithAuthor[]>({
-    queryKey: POSTS_KEY,
+    queryKey: [POSTS_KEY, page],
     queryFn: async () => {
-      const { data } = await postsApi.fetchPosts()
+      const { data } = await postsApi.fetchPosts({ page: page.value })
       return data.map((post) => ({
         ...post,
         likedByMe: post.likedByMe ?? false,
       }))
     },
+    placeholderData: (previousData) => previousData,
   })
 }
 

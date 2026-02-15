@@ -2,8 +2,8 @@ import api from './api'
 import type { CreatePostPayload, PostWithAuthor } from '@/types/posts'
 
 export const postsApi = {
-  fetchPosts() {
-    return api.get<PostWithAuthor[]>('/posts')
+  fetchPosts({ page = 1 }: { page: number }) {
+    return api.get<PostWithAuthor[]>(`/posts?page=${page}&limit=10`)
   },
 
   fetchPostsByUser(userId: string) {
