@@ -17,16 +17,19 @@ export const router = createRouter({
           path: 'login',
           name: 'login',
           component: () => import('@/views/auth/LoginView.vue'),
+          meta: { requiresGuest: true },
         },
         {
           path: 'register',
           name: 'register',
           component: () => import('@/views/auth/RegisterView.vue'),
+          meta: { requiresGuest: true },
         },
         {
           path: 'posts/:id',
           name: 'post.details',
           component: () => import('@/views/PostDetailsView.vue'),
+          meta: { requiresAuth: true },
         },
         {
           path: 'profile',
@@ -38,6 +41,7 @@ export const router = createRouter({
           path: 'users/:id',
           name: 'user.profile',
           component: () => import('@/views/UserProfileView.vue'),
+          meta: { requiresAuth: true },
         },
       ],
     },
@@ -47,9 +51,14 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
 
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    next({ name: 'home' })
-  }
+  const requiresAuth = to.meta.requiresAuth
+  const requiresGuest = to.meta.requiresGuest
 
-  next()
+  if (requiresAuth && !auth.isAuthenticated) {
+    next({ name: 'login' })
+  } else if (requiresGuest && auth.isAuthenticated) {
+    next({ name: 'home' })
+  } else {
+    next()
+  }
 })
